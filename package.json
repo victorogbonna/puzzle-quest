@@ -1,0 +1,9 @@
+{
+  "name": "puzzle-quest",
+  "version": "1.0.0",
+  "description": "A fun puzzle game for kids!",
+  "main": "game.js",
+  "scripts": {
+    "start": "node game.js"
+  }
+}
