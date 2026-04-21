@@ -1,36 +1,16 @@
-const readline = require("readline");
-
-// ── ANSI colours ──────────────────────────────────────────────────────────────
-const C = {
-  reset: "\x1b[0m",
-  bright: "\x1b[1m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-  cyan: "\x1b[36m",
-  white: "\x1b[37m",
-  bgBlue: "\x1b[44m",
-  bgMagenta: "\x1b[45m",
-  bgGreen: "\x1b[42m",
-};
-
-const col = (color, text) => `${C[color]}${C.bright}${text}${C.reset}`;
-
 // ── Puzzle bank ───────────────────────────────────────────────────────────────
 const PUZZLES = {
   wordScramble: [
-    { scrambled: "ZZAIP", answer: "PIZZA", hint: "Yummy round food with toppings 🍕" },
-    { scrambled: "TACER", answer: "CATER", hint: "To provide food for people 🍽️" },
-    { scrambled: "NOECY", answer: "MONEY", hint: "Used to buy things 💰" },
-    { scrambled: "REBAT", answer: "BATER", hint: "Try 'BEAR' + T… wait, it's BEAR + T rearranged!" },
-    { scrambled: "LCEARI", answer: "CEREAL", hint: "Breakfast food you pour milk on 🥣" },
-    { scrambled: "PSLAE", answer: "LEAPS", hint: "Jumps or spring forward 🐸" },
-    { scrambled: "TAINC", answer: "ANTIC", hint: "A silly or funny trick 🤪" },
-    { scrambled: "RCEAK", answer: "CREAK", hint: "Sound a spooky door makes 👻" },
-    { scrambled: "HOSPY", answer: "HYPOS", hint: "Short forms of hypotheses 🔬" },
-    { scrambled: "LGUNE", answer: "LUNGE", hint: "A sudden forward movement ⚔️" },
+    { scrambled: "ZZAIP",  answer: "PIZZA",    hint: "Yummy round food with toppings 🍕" },
+    { scrambled: "LCEARI", answer: "CEREAL",   hint: "Breakfast food you pour milk on 🥣" },
+    { scrambled: "NOECY",  answer: "MONEY",    hint: "Used to buy things 💰" },
+    { scrambled: "RCEAK",  answer: "CREAK",    hint: "Sound a spooky door makes 👻" },
+    { scrambled: "PSLAE",  answer: "LEAPS",    hint: "Jumps or springs forward 🐸" },
+    { scrambled: "LGUNE",  answer: "LUNGE",    hint: "A sudden forward movement ⚔️" },
+    { scrambled: "TOBOR",  answer: "ROBOT",    hint: "A machine that can do tasks 🤖" },
+    { scrambled: "CALME",  answer: "CAMEL",    hint: "A desert animal with humps 🐪" },
+    { scrambled: "TRIGS",  answer: "GRITS",    hint: "A type of ground corn food 🌽" },
+    { scrambled: "PELPA",  answer: "APPLE",    hint: "A crunchy red or green fruit 🍎" },
   ],
   riddles: [
     {
@@ -59,7 +39,7 @@ const PUZZLES = {
       hint: "Think about walking on a beach 🏖️",
     },
     {
-      question: "I have cities, but no houses live there. I have mountains, but no trees grow there. I have water, but no fish swim there. What am I?",
+      question: "I have cities, but no houses. Mountains, but no trees. Water, but no fish. What am I?",
       answer: "map",
       hint: "You use me to find your way 🗺️",
     },
@@ -78,7 +58,7 @@ const PUZZLES = {
     {
       question: "If you have 3 apples and get 5 more, then give 4 away — how many do you have?",
       answer: "4",
-      hint: "3 + 5 = 8, then 8 - 4 = ?",
+      hint: "3 + 5 = 8, then 8 − 4 = ?",
     },
     {
       question: "A spider has 8 legs. How many legs do 7 spiders have?",
@@ -91,12 +71,7 @@ const PUZZLES = {
       hint: "Half of 64 is 32, then add 10",
     },
     {
-      question: "There are 5 rows of seats with 6 seats each. 12 people leave. How many seats are now empty?",
-      answer: "12",
-      hint: "Total seats = 5×6 = 30. 30 - 12 people sitting? Wait — 12 people LEAVE, so 12 seats freed! 🪑",
-    },
-    {
-      question: "If a train travels 60 km every hour, how far does it travel in 3 and a half hours?",
+      question: "If a train travels 60 km every hour, how far in 3 and a half hours?",
       answer: "210",
       hint: "60 × 3 = 180, plus 60 × 0.5 = 30 🚂",
     },
@@ -111,249 +86,320 @@ const PUZZLES = {
       hint: "3 weeks = 21 days. 21 × 5 = ? 💰",
     },
     {
-      question: "What number is missing? 2, 4, 8, 16, ___",
+      question: "What number comes next? 2, 4, 8, 16, ___",
       answer: "32",
       hint: "Each number is doubled 🔢",
+    },
+    {
+      question: "There are 6 boxes with 9 crayons each. How many crayons in total?",
+      answer: "54",
+      hint: "Multiply 6 × 9 🖍️",
     },
   ],
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function shuffleArray(arr) {
-  const copy = [...arr];
-  for (let i = copy.length - 1; i > 0; i--) {
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return copy;
+  return a;
 }
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-function clearScreen() {
-  process.stdout.write("\x1Bc");
+// ── DOM helpers ───────────────────────────────────────────────────────────────
+const output      = document.getElementById("output");
+const answerInput = document.getElementById("answer-input");
+const submitBtn   = document.getElementById("submit-btn");
+const statusBar   = document.createElement("div");
+
+function print(text = "", color = "white", extra = "") {
+  const el = document.createElement("div");
+  el.className = `line ${color} ${extra}`.trim();
+  el.textContent = text;
+  output.appendChild(el);
+  output.scrollTop = output.scrollHeight;
+  return el;
 }
 
-function printBanner() {
-  console.log(col("cyan",  "╔═══════════════════════════════════════════╗"));
-  console.log(col("cyan",  "║") + col("yellow", "       🧩  PUZZLE QUEST ADVENTURE  🧩      ") + col("cyan", "║"));
-  console.log(col("cyan",  "╚═══════════════════════════════════════════╝"));
-  console.log();
+function spacer() {
+  const el = document.createElement("div");
+  el.className = "spacer";
+  output.appendChild(el);
 }
 
-function printStatus(score, lives, round, total) {
-  const hearts = "❤️ ".repeat(lives) + "🖤 ".repeat(3 - lives);
-  console.log(
-    col("green", ` Score: ${score}`) +
-    "  " +
-    `Lives: ${hearts}` +
-    "  " +
-    col("blue", `Round: ${round}/${total}`)
-  );
-  console.log(col("cyan", "─".repeat(46)));
+function clearOutput() {
+  output.innerHTML = "";
 }
 
-// ── Game class ────────────────────────────────────────────────────────────────
+function updateStatusBar(score, lives, round, total) {
+  const bar = document.getElementById("status-bar");
+  if (!bar) return;
+  bar.querySelector("#status-score").textContent = `⭐ Score: ${score}`;
+  bar.querySelector("#status-lives").textContent = "❤️".repeat(lives) + "🖤".repeat(3 - lives);
+  bar.querySelector("#status-round").textContent = `Round ${round} / ${total}`;
+}
+
+// ── Input promise ─────────────────────────────────────────────────────────────
+function waitForInput() {
+  return new Promise((resolve) => {
+    answerInput.disabled = false;
+    answerInput.focus();
+
+    function onSubmit() {
+      const val = answerInput.value.trim();
+      answerInput.value = "";
+      answerInput.disabled = true;
+      submitBtn.removeEventListener("click", onSubmit);
+      answerInput.removeEventListener("keydown", onKey);
+      resolve(val);
+    }
+
+    function onKey(e) {
+      if (e.key === "Enter") onSubmit();
+    }
+
+    submitBtn.addEventListener("click", onSubmit);
+    answerInput.addEventListener("keydown", onKey);
+  });
+}
+
+// ── Quick-action chips ────────────────────────────────────────────────────────
+function addQuickActions() {
+  const existing = document.getElementById("quick-actions");
+  if (existing) return;
+  const div = document.createElement("div");
+  div.id = "quick-actions";
+  div.innerHTML = `
+    <button class="chip hint-chip" onclick="injectInput('HINT')">💡 Hint (-1 pt)</button>
+    <button class="chip skip-chip" onclick="injectInput('SKIP')">⏭️ Skip (-1 life)</button>
+  `;
+  document.getElementById("app").insertBefore(div, document.getElementById("input-row"));
+}
+
+function removeQuickActions() {
+  const el = document.getElementById("quick-actions");
+  if (el) el.remove();
+}
+
+function injectInput(val) {
+  answerInput.value = val;
+  submitBtn.click();
+}
+
+// ── Status bar ────────────────────────────────────────────────────────────────
+function addStatusBar() {
+  if (document.getElementById("status-bar")) return;
+  const bar = document.createElement("div");
+  bar.id = "status-bar";
+  bar.innerHTML = `
+    <span id="status-score">⭐ Score: 0</span>
+    <span id="status-lives">❤️❤️❤️</span>
+    <span id="status-round">Round 0 / 0</span>
+  `;
+  const app = document.getElementById("app");
+  app.insertBefore(bar, document.getElementById("output"));
+}
+
+// ── Game ──────────────────────────────────────────────────────────────────────
 class PuzzleGame {
   constructor() {
-    this.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    this.score = 0;
-    this.lives = 3;
-    this.round = 0;
+    this.score      = 0;
+    this.lives      = 3;
+    this.playerName = "";
+    this.rounds     = [];
   }
 
-  ask(question) {
-    return new Promise((resolve) => {
-      this.rl.question(question, resolve);
-    });
+  buildRounds() {
+    const scrambles = shuffle(PUZZLES.wordScramble).slice(0, 4).map((p) => ({ type: "wordScramble", ...p }));
+    const riddles   = shuffle(PUZZLES.riddles).slice(0, 3).map((p) => ({ type: "riddle", ...p }));
+    const maths     = shuffle(PUZZLES.math).slice(0, 3).map((p) => ({ type: "math", ...p }));
+    return shuffle([...scrambles, ...riddles, ...maths]);
   }
 
-  async pause(msg = "Press ENTER to continue...") {
-    await this.ask(col("magenta", `\n  ${msg} `));
-  }
+  async intro() {
+    clearOutput();
+    spacer();
+    print("╔══════════════════════════════════════════╗", "banner");
+    print("║    🧩  PUZZLE QUEST ADVENTURE  🧩        ║", "banner");
+    print("╚══════════════════════════════════════════╝", "banner");
+    spacer();
+    print("Welcome, brave puzzle solver! 🌟", "yellow bold");
+    spacer();
+    print("You will face 3 types of challenges:", "white");
+    print("  🔤  Word Scramble  — unscramble the jumbled word", "green");
+    print("  🤔  Riddles        — think hard and solve it", "blue");
+    print("  🔢  Math Puzzles   — crunch the numbers", "magenta");
+    spacer();
+    print("Rules:", "cyan bold");
+    print("  • You have 3 lives ❤️", "white");
+    print("  • Type HINT for a clue (costs 1 point)", "yellow");
+    print("  • Type SKIP to skip (costs 1 life)", "red");
+    spacer();
+    print("What is your name, adventurer?", "cyan");
 
-  async showIntro() {
-    clearScreen();
-    printBanner();
-    console.log(col("yellow", "  Welcome, brave puzzle solver! 🌟"));
-    console.log();
-    console.log("  You'll face 3 types of challenges:");
-    console.log(col("green",   "   🔤  Word Scramble") + " — unscramble the jumbled word");
-    console.log(col("blue",    "   🤔  Riddles")       + " — think hard and solve the riddle");
-    console.log(col("magenta", "   🔢  Math Puzzles")  + " — crunch the numbers");
-    console.log();
-    console.log("  Rules:");
-    console.log("   • You have " + col("red", "3 lives ❤️"));
-    console.log("   • Type " + col("yellow", "HINT") + " if you're stuck (costs 1 point)");
-    console.log("   • Type " + col("red",    "SKIP") + " to skip a question (loses 1 life)");
-    console.log();
-    const name = await this.ask(col("cyan", "  What is your name, adventurer? "));
-    this.playerName = name.trim() || "Explorer";
-    console.log();
-    console.log(col("green", `  Great! Let's go, ${this.playerName}! 🚀`));
-    await sleep(1500);
-  }
+    const name = await waitForInput();
+    this.playerName = name || "Explorer";
 
-  async buildRounds() {
-    const scrambles = shuffleArray(PUZZLES.wordScramble).slice(0, 4).map((p) => ({
-      type: "wordScramble",
-      ...p,
-    }));
-    const riddles = shuffleArray(PUZZLES.riddles).slice(0, 3).map((p) => ({
-      type: "riddle",
-      ...p,
-    }));
-    const maths = shuffleArray(PUZZLES.math).slice(0, 3).map((p) => ({
-      type: "math",
-      ...p,
-    }));
-    return shuffleArray([...scrambles, ...riddles, ...maths]);
-  }
-
-  async playWordScramble(puzzle) {
-    console.log(col("green", "  🔤  WORD SCRAMBLE"));
-    console.log();
-    console.log("  Unscramble this word:");
-    console.log(col("yellow", `  ➤  ${puzzle.scrambled}`));
-    console.log();
-  }
-
-  async playRiddle(puzzle) {
-    console.log(col("blue", "  🤔  RIDDLE"));
-    console.log();
-    const words = puzzle.question.match(/.{1,50}(\s|$)/g) || [puzzle.question];
-    words.forEach((line) => console.log("  " + line.trim()));
-    console.log();
-  }
-
-  async playMath(puzzle) {
-    console.log(col("magenta", "  🔢  MATH PUZZLE"));
-    console.log();
-    const words = puzzle.question.match(/.{1,55}(\s|$)/g) || [puzzle.question];
-    words.forEach((line) => console.log("  " + line.trim()));
-    console.log();
+    clearOutput();
+    spacer();
+    print(`  Get ready, ${this.playerName}! 🚀`, "green bold");
+    print("  Your quest begins in 3 seconds...", "gray");
+    await sleep(3000);
   }
 
   async playRound(puzzle, index, total) {
-    clearScreen();
-    printBanner();
-    printStatus(this.score, this.lives, index + 1, total);
-    console.log();
+    clearOutput();
+    updateStatusBar(this.score, this.lives, index + 1, total);
+    spacer();
 
-    if (puzzle.type === "wordScramble") await this.playWordScramble(puzzle);
-    else if (puzzle.type === "riddle") await this.playRiddle(puzzle);
-    else await this.playMath(puzzle);
+    if (puzzle.type === "wordScramble") {
+      print("🔤  WORD SCRAMBLE", "green bold");
+      spacer();
+      print("Unscramble this word:", "white");
+      print(`  ➤  ${puzzle.scrambled}`, "yellow bold");
+    } else if (puzzle.type === "riddle") {
+      print("🤔  RIDDLE", "blue bold");
+      spacer();
+      print(puzzle.question, "white");
+    } else {
+      print("🔢  MATH PUZZLE", "magenta bold");
+      spacer();
+      print(puzzle.question, "white");
+    }
+
+    spacer();
+    print("Type your answer below (or use the buttons):", "gray");
+    addQuickActions();
 
     let hintUsed = false;
-    let answered = false;
 
-    while (!answered) {
-      const raw = await this.ask(col("cyan", "  Your answer: "));
-      const input = raw.trim().toUpperCase();
+    while (true) {
+      const raw   = await waitForInput();
+      const input = raw.toUpperCase().trim();
+
+      if (!input) continue;
+
+      // Echo input
+      print(`  ➤  ${raw}`, "gray");
 
       if (input === "HINT") {
         if (!hintUsed) {
           hintUsed = true;
-          console.log(col("yellow", `  💡 Hint: ${puzzle.hint}`));
+          this.score = Math.max(0, this.score - 1);
+          spacer();
+          print(`💡  Hint: ${puzzle.hint}`, "yellow");
+          updateStatusBar(this.score, this.lives, index + 1, total);
         } else {
-          console.log(col("yellow", "  You already used your hint!"));
+          print("You already used your hint!", "yellow");
         }
         continue;
       }
 
       if (input === "SKIP") {
         this.lives--;
-        console.log(col("red", "  ⏭️  Skipped! The answer was: ") + col("white", puzzle.answer.toUpperCase()));
-        await sleep(2000);
-        answered = true;
-        break;
+        spacer();
+        print(`⏭️  Skipped! The answer was: ${puzzle.answer.toUpperCase()}`, "red");
+        updateStatusBar(this.score, this.lives, index + 1, total);
+        removeQuickActions();
+        await sleep(2200);
+        return;
       }
 
-      const correct = puzzle.answer.toUpperCase();
-      if (input === correct) {
+      if (input === puzzle.answer.toUpperCase()) {
         const points = hintUsed ? 5 : 10;
         this.score += points;
-        const msgs = [
-          "🎉 Amazing!",
-          "🌟 Brilliant!",
-          "🔥 You're on fire!",
-          "💪 Superstar!",
-          "🏆 Genius!",
-        ];
-        const msg = msgs[Math.floor(Math.random() * msgs.length)];
-        console.log(col("green", `  ${msg} +${points} points!`));
+        const msgs = ["🎉 Amazing!", "🌟 Brilliant!", "🔥 You're on fire!", "💪 Superstar!", "🏆 Genius!"];
+        const msg  = msgs[Math.floor(Math.random() * msgs.length)];
+        spacer();
+        print(`${msg}  +${points} points!`, "green bold");
+        updateStatusBar(this.score, this.lives, index + 1, total);
+        removeQuickActions();
         await sleep(1800);
-        answered = true;
-      } else {
-        console.log(col("red", "  ❌ Not quite! Try again. (Type HINT for help or SKIP to skip)"));
+        return;
       }
+
+      spacer();
+      print("❌  Not quite! Try again.", "red");
+      print("   (Use 💡 Hint if you're stuck, or ⏭️ Skip to move on)", "gray");
     }
   }
 
   async showResults(total) {
-    clearScreen();
-    printBanner();
-    console.log();
+    removeQuickActions();
+    clearOutput();
+    spacer();
 
-    const percent = Math.round((this.score / (total * 10)) * 100);
+    const maxScore = total * 10;
+    const pct      = Math.round((this.score / maxScore) * 100);
 
-    let emoji, msg;
-    if (percent >= 90)      { emoji = "🏆"; msg = "LEGENDARY PUZZLE MASTER!"; }
-    else if (percent >= 70) { emoji = "🌟"; msg = "AMAZING ADVENTURER!"; }
-    else if (percent >= 50) { emoji = "👍"; msg = "GREAT JOB, KEEP GOING!"; }
-    else                    { emoji = "💪"; msg = "GOOD TRY — PRACTICE MAKES PERFECT!"; }
+    let emoji, msg, color;
+    if (pct >= 90)      { emoji = "🏆"; msg = "LEGENDARY PUZZLE MASTER!";    color = "yellow"; }
+    else if (pct >= 70) { emoji = "🌟"; msg = "AMAZING ADVENTURER!";          color = "cyan";   }
+    else if (pct >= 50) { emoji = "👍"; msg = "GREAT JOB, KEEP GOING!";       color = "green";  }
+    else                { emoji = "💪"; msg = "GOOD TRY — PRACTICE MAKES PERFECT!"; color = "magenta"; }
 
-    console.log(col("yellow", `  ${emoji}  ${this.playerName}, you scored:`));
-    console.log();
-    console.log(col("cyan",   `       ${this.score} points out of ${total * 10}`));
-    console.log();
-    console.log(col("green",  `       ${msg}`));
-    console.log();
+    print(`${emoji}  ${this.playerName}, here's how you did:`, color + " bold");
+    spacer();
+    print(`   Score:  ${this.score} / ${maxScore}  (${pct}%)`, "white bold");
+    spacer();
+    print(`   ${msg}`, color);
+    spacer();
 
     if (this.lives > 0) {
-      console.log(col("green", `  Lives remaining: ${"❤️ ".repeat(this.lives)}`));
+      print(`   Lives remaining: ${"❤️".repeat(this.lives)}`, "green");
     } else {
-      console.log(col("red", "  You ran out of lives, but you still did great!"));
+      print("   You ran out of lives — but you still did great!", "red");
     }
 
-    console.log();
-    console.log(col("cyan", "─".repeat(46)));
+    spacer();
+    print("─".repeat(44), "divider");
+    spacer();
+    print("Play again? Type YES or NO", "cyan");
   }
 
   async run() {
-    await this.showIntro();
+    addStatusBar();
+    await this.intro();
 
-    const rounds = await this.buildRounds();
+    this.rounds = this.buildRounds();
+    updateStatusBar(this.score, this.lives, 0, this.rounds.length);
 
-    for (let i = 0; i < rounds.length; i++) {
+    for (let i = 0; i < this.rounds.length; i++) {
       if (this.lives <= 0) break;
-      await this.playRound(rounds[i], i, rounds.length);
+      await this.playRound(this.rounds[i], i, this.rounds.length);
     }
 
-    await this.showResults(rounds.length);
+    await this.showResults(this.rounds.length);
 
-    const again = await this.ask(col("yellow", "  Play again? (yes / no): "));
-    if (again.trim().toLowerCase().startsWith("y")) {
-      this.score = 0;
-      this.lives = 3;
-      this.round = 0;
-      await this.run();
-    } else {
-      console.log();
-      console.log(col("cyan", "  Thanks for playing! See you next time! 👋"));
-      console.log();
-      this.rl.close();
+    while (true) {
+      const ans = await waitForInput();
+      if (ans.toUpperCase().startsWith("Y")) {
+        this.score = 0;
+        this.lives = 3;
+        await this.run();
+        return;
+      } else if (ans.toUpperCase().startsWith("N")) {
+        clearOutput();
+        spacer();
+        print("Thanks for playing! See you next time! 👋", "cyan bold");
+        print(`Keep being awesome, ${this.playerName}! 🌟`, "yellow");
+        answerInput.disabled = true;
+        submitBtn.disabled   = true;
+        removeQuickActions();
+        return;
+      }
+      print('Type YES to play again or NO to quit.', 'gray');
     }
   }
 }
 
-// ── Entry point ───────────────────────────────────────────────────────────────
-new PuzzleGame().run().catch((err) => {
-  console.error("Oops! Something went wrong:", err.message);
-  process.exit(1);
+// ── Start ─────────────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", () => {
+  new PuzzleGame().run();
 });
