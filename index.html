@@ -13,6 +13,82 @@
         <span class="dot yellow"></span>
         <span class="dot green"></span>
         <span id="terminal-title">🧩 Puzzle Quest Adventure</span>
+        <button id="help-btn" onclick="toggleHelp()" title="How to Play">? Help</button>
+      </div>
+
+      <!-- How to Play modal -->
+      <div id="help-overlay" role="dialog" aria-modal="true" aria-label="How to Play">
+        <div id="help-box">
+          <div id="help-header">
+            <span>📖 How to Play</span>
+            <button id="help-close" onclick="toggleHelp()" aria-label="Close">✕</button>
+          </div>
+          <div id="help-body">
+
+            <div class="help-section">
+              <div class="help-section-title">🎯 Goal</div>
+              <p>Answer as many puzzles as you can to earn points and become a <strong>Puzzle Master</strong>!</p>
+            </div>
+
+            <div class="help-section">
+              <div class="help-section-title">🔤 Word Scramble</div>
+              <p>A word is jumbled up. Unscramble the letters to find the real word.</p>
+              <div class="help-example">
+                <span class="ex-label">Example:</span>
+                <span class="ex-scrambled">TOBOR</span>
+                <span class="ex-arrow">→</span>
+                <span class="ex-answer">ROBOT</span>
+              </div>
+            </div>
+
+            <div class="help-section">
+              <div class="help-section-title">🤔 Riddles</div>
+              <p>Read the clue carefully and type the one-word answer that fits.</p>
+              <div class="help-example">
+                <span class="ex-label">Example:</span>
+                <span class="ex-scrambled">"I have hands but can't clap"</span>
+                <span class="ex-arrow">→</span>
+                <span class="ex-answer">CLOCK</span>
+              </div>
+            </div>
+
+            <div class="help-section">
+              <div class="help-section-title">🔢 Math Puzzles</div>
+              <p>Solve the maths problem and type the number as your answer.</p>
+              <div class="help-example">
+                <span class="ex-label">Example:</span>
+                <span class="ex-scrambled">8 × 7 = ?</span>
+                <span class="ex-arrow">→</span>
+                <span class="ex-answer">56</span>
+              </div>
+            </div>
+
+            <div class="help-section">
+              <div class="help-section-title">⚙️ Controls</div>
+              <ul class="help-list">
+                <li><span class="tag green-tag">ENTER</span> Submit your answer</li>
+                <li><span class="tag yellow-tag">💡 HINT</span> Get a clue — costs <strong>1 point</strong></li>
+                <li><span class="tag red-tag">⏭️ SKIP</span> Skip the question — costs <strong>1 life ❤️</strong></li>
+              </ul>
+            </div>
+
+            <div class="help-section">
+              <div class="help-section-title">🏆 Scoring</div>
+              <ul class="help-list">
+                <li>✅ Correct answer (no hint) → <strong>+10 points</strong></li>
+                <li>✅ Correct answer (with hint) → <strong>+5 points</strong></li>
+                <li>❌ Wrong answer → try again, no penalty</li>
+                <li>⏭️ Skip → lose <strong>1 life</strong></li>
+              </ul>
+            </div>
+
+            <div class="help-section">
+              <div class="help-section-title">❤️ Lives</div>
+              <p>You start with <strong>3 lives</strong>. Lose all 3 and the game ends early. Good luck!</p>
+            </div>
+
+          </div>
+        </div>
       </div>
 
       <div id="output" aria-live="polite"></div>

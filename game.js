@@ -399,6 +399,30 @@ class PuzzleGame {
   }
 }
 
+// ── How to Play modal ─────────────────────────────────────────────────────────
+function toggleHelp() {
+  const overlay = document.getElementById("help-overlay");
+  overlay.classList.toggle("open");
+  if (overlay.classList.contains("open")) {
+    document.getElementById("help-close").focus();
+    overlay.addEventListener("click", outsideClick);
+  } else {
+    overlay.removeEventListener("click", outsideClick);
+    answerInput.focus();
+  }
+}
+
+function outsideClick(e) {
+  if (e.target === document.getElementById("help-overlay")) toggleHelp();
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const overlay = document.getElementById("help-overlay");
+    if (overlay.classList.contains("open")) toggleHelp();
+  }
+});
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", () => {
   new PuzzleGame().run();
