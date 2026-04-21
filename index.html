@@ -7,105 +7,203 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="app">
-      <div id="terminal-header">
-        <span class="dot red"></span>
-        <span class="dot yellow"></span>
-        <span class="dot green"></span>
-        <span id="terminal-title">🧩 Puzzle Quest Adventure</span>
-        <button id="help-btn" onclick="toggleHelp()" title="How to Play">? Help</button>
-      </div>
 
-      <!-- How to Play modal -->
-      <div id="help-overlay" role="dialog" aria-modal="true" aria-label="How to Play">
-        <div id="help-box">
-          <div id="help-header">
-            <span>📖 How to Play</span>
-            <button id="help-close" onclick="toggleHelp()" aria-label="Close">✕</button>
-          </div>
-          <div id="help-body">
+    <div id="game">
 
-            <div class="help-section">
-              <div class="help-section-title">🎯 Goal</div>
-              <p>Answer as many puzzles as you can to earn points and become a <strong>Puzzle Master</strong>!</p>
-            </div>
+      <!-- ── Top header ──────────────────────────────────────── -->
+      <header id="header">
+        <div id="brand">🧩 <span>Puzzle Quest</span></div>
+        <button id="help-btn" onclick="toggleHelp()">❓ How to Play</button>
+      </header>
 
-            <div class="help-section">
-              <div class="help-section-title">🔤 Word Scramble</div>
-              <p>A word is jumbled up. Unscramble the letters to find the real word.</p>
-              <div class="help-example">
-                <span class="ex-label">Example:</span>
-                <span class="ex-scrambled">TOBOR</span>
-                <span class="ex-arrow">→</span>
-                <span class="ex-answer">ROBOT</span>
-              </div>
-            </div>
-
-            <div class="help-section">
-              <div class="help-section-title">🤔 Riddles</div>
-              <p>Read the clue carefully and type the one-word answer that fits.</p>
-              <div class="help-example">
-                <span class="ex-label">Example:</span>
-                <span class="ex-scrambled">"I have hands but can't clap"</span>
-                <span class="ex-arrow">→</span>
-                <span class="ex-answer">CLOCK</span>
-              </div>
-            </div>
-
-            <div class="help-section">
-              <div class="help-section-title">🔢 Math Puzzles</div>
-              <p>Solve the maths problem and type the number as your answer.</p>
-              <div class="help-example">
-                <span class="ex-label">Example:</span>
-                <span class="ex-scrambled">8 × 7 = ?</span>
-                <span class="ex-arrow">→</span>
-                <span class="ex-answer">56</span>
-              </div>
-            </div>
-
-            <div class="help-section">
-              <div class="help-section-title">⚙️ Controls</div>
-              <ul class="help-list">
-                <li><span class="tag green-tag">ENTER</span> Submit your answer</li>
-                <li><span class="tag yellow-tag">💡 HINT</span> Get a clue — costs <strong>1 point</strong></li>
-                <li><span class="tag red-tag">⏭️ SKIP</span> Skip the question — costs <strong>1 life ❤️</strong></li>
-              </ul>
-            </div>
-
-            <div class="help-section">
-              <div class="help-section-title">🏆 Scoring</div>
-              <ul class="help-list">
-                <li>✅ Correct answer (no hint) → <strong>+10 points</strong></li>
-                <li>✅ Correct answer (with hint) → <strong>+5 points</strong></li>
-                <li>❌ Wrong answer → try again, no penalty</li>
-                <li>⏭️ Skip → lose <strong>1 life</strong></li>
-              </ul>
-            </div>
-
-            <div class="help-section">
-              <div class="help-section-title">❤️ Lives</div>
-              <p>You start with <strong>3 lives</strong>. Lose all 3 and the game ends early. Good luck!</p>
-            </div>
-
-          </div>
+      <!-- ── Stats bar (shown during game) ──────────────────── -->
+      <div id="stats-bar" class="hidden">
+        <div class="stat">
+          <div class="stat-value" id="stat-score">0</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat lives-stat">
+          <div class="stat-value" id="stat-lives">❤️❤️❤️</div>
+          <div class="stat-label">Lives</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-round">1 / 10</div>
+          <div class="stat-label">Round</div>
         </div>
       </div>
 
-      <div id="output" aria-live="polite"></div>
+      <!-- ── Progress bar ────────────────────────────────────── -->
+      <div id="progress-wrap" class="hidden">
+        <div id="progress-bar"></div>
+      </div>
 
-      <div id="input-row">
-        <span id="prompt">➤</span>
-        <input
-          id="answer-input"
-          type="text"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="Type your answer here..."
-          aria-label="Your answer"
-        />
-        <button id="submit-btn">ENTER</button>
+      <!-- ── Screens ─────────────────────────────────────────── -->
+      <main id="main">
+
+        <!-- Intro screen -->
+        <div id="screen-intro" class="screen active">
+          <div class="intro-card">
+            <div class="intro-emoji">🧩</div>
+            <h1>Puzzle Quest</h1>
+            <p class="intro-sub">Test your brain with word scrambles, riddles, and maths — earn points and become a Puzzle Master!</p>
+            <div class="category-pills">
+              <span class="pill green">🔤 Word Scramble</span>
+              <span class="pill blue">🤔 Riddles</span>
+              <span class="pill purple">🔢 Maths</span>
+            </div>
+            <div class="name-group">
+              <label for="name-input">Your name, adventurer:</label>
+              <input id="name-input" type="text" placeholder="Enter your name…" maxlength="20" />
+            </div>
+            <button id="start-btn" class="primary-btn">Start Quest ✨</button>
+          </div>
+        </div>
+
+        <!-- Question screen -->
+        <div id="screen-question" class="screen">
+
+          <!-- Question card — always visible -->
+          <div id="question-card">
+            <div id="q-badge">🔤 Word Scramble</div>
+            <div id="q-body"></div>
+            <div id="hint-box" class="hidden">
+              <span class="hint-icon">💡</span>
+              <span id="hint-text"></span>
+            </div>
+          </div>
+
+          <!-- Feedback messages -->
+          <div id="feedback-area"></div>
+
+        </div>
+
+        <!-- Results screen -->
+        <div id="screen-results" class="screen">
+          <div class="results-card">
+            <div id="results-emoji">🏆</div>
+            <h2 id="results-title">Amazing!</h2>
+            <div id="results-score-display">
+              <span id="results-score">0</span>
+              <span id="results-max">/ 100</span>
+            </div>
+            <div id="results-bar-wrap">
+              <div id="results-bar"></div>
+            </div>
+            <p id="results-msg"></p>
+            <div id="results-lives"></div>
+            <div class="results-btns">
+              <button class="primary-btn" id="play-again-btn">Play Again 🔄</button>
+              <button class="secondary-btn" id="quit-btn">Quit 👋</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goodbye screen -->
+        <div id="screen-bye" class="screen">
+          <div class="bye-card">
+            <div class="intro-emoji">👋</div>
+            <h2 id="bye-msg">Thanks for playing!</h2>
+            <p id="bye-sub"></p>
+            <button class="primary-btn" onclick="location.reload()">Play Again 🔄</button>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- ── Footer input (visible during game) ─────────────── -->
+      <footer id="footer" class="hidden">
+        <div id="action-row">
+          <button class="action-btn hint-action" id="hint-action-btn">💡 Hint <span class="cost">−1 pt</span></button>
+          <button class="action-btn skip-action" id="skip-action-btn">⏭️ Skip <span class="cost">−1 life</span></button>
+        </div>
+        <div id="input-row">
+          <input
+            id="answer-input"
+            type="text"
+            placeholder="Type your answer here…"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+          />
+          <button id="submit-btn">Enter ↵</button>
+        </div>
+      </footer>
+
+    </div><!-- /#game -->
+
+    <!-- ── How to Play modal ───────────────────────────────── -->
+    <div id="help-overlay" role="dialog" aria-modal="true" aria-label="How to Play">
+      <div id="help-box">
+        <div id="help-header">
+          <span>📖 How to Play</span>
+          <button id="help-close" onclick="toggleHelp()" aria-label="Close">✕</button>
+        </div>
+        <div id="help-body">
+
+          <div class="help-section">
+            <div class="help-section-title">🎯 Goal</div>
+            <p>Answer as many puzzles as you can to earn points and become a <strong>Puzzle Master</strong>!</p>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">🔤 Word Scramble</div>
+            <p>A word is jumbled up. Unscramble the letters to find the real word.</p>
+            <div class="help-example">
+              <span class="ex-label">Example:</span>
+              <span class="ex-scrambled">TOBOR</span>
+              <span class="ex-arrow">→</span>
+              <span class="ex-answer">ROBOT</span>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">🤔 Riddles</div>
+            <p>Read the clue carefully and type the one-word answer.</p>
+            <div class="help-example">
+              <span class="ex-label">Example:</span>
+              <span class="ex-scrambled">"I have hands but can't clap"</span>
+              <span class="ex-arrow">→</span>
+              <span class="ex-answer">CLOCK</span>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">🔢 Maths Puzzles</div>
+            <p>Solve the problem and type the number as your answer.</p>
+            <div class="help-example">
+              <span class="ex-label">Example:</span>
+              <span class="ex-scrambled">8 × 7 = ?</span>
+              <span class="ex-arrow">→</span>
+              <span class="ex-answer">56</span>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">⚙️ Controls</div>
+            <ul class="help-list">
+              <li><span class="tag green-tag">Enter ↵</span> Submit your answer</li>
+              <li><span class="tag yellow-tag">💡 Hint</span> Get a clue — costs <strong>1 point</strong></li>
+              <li><span class="tag red-tag">⏭️ Skip</span> Skip the question — costs <strong>1 life</strong></li>
+            </ul>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">🏆 Scoring</div>
+            <ul class="help-list">
+              <li>✅ Correct (no hint) → <strong>+10 points</strong></li>
+              <li>✅ Correct (with hint) → <strong>+5 points</strong></li>
+              <li>❌ Wrong answer → try again, no penalty</li>
+              <li>⏭️ Skip → lose <strong>1 life ❤️</strong></li>
+            </ul>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">❤️ Lives</div>
+            <p>You start with <strong>3 lives</strong>. Lose all 3 and the game ends early. Good luck!</p>
+          </div>
+
+        </div>
       </div>
     </div>
 
